@@ -16,6 +16,24 @@
                         <h1 class="itemp">Comment: <%= contact.Comment %></h1>
                         <p class="itemp">Name: <%= contact.name %></p>
                         <p class="itemp">Email: <%= contact.email %></p>
+                        <a href="/editcontact/<%= contact.id %>" class="button">Edit</a>
+  <p class="button" id="doit<%= contact.id %>">Delete</a>
+  <p id="yes<%= contact.id %>" style="display:none">
+  Are you sure?
+                        <a href="/deletecontact/<%= contact.id %>" class="button">Yes</a>
+             </p>
+             
+             <script>
+               $(document).ready(function(){
+                 $("#doit<%= contact.id %>").click(function(){
+                   $("#yes<%= contact.id %>").slideToggle(2000);
+                   
+                 })
+                 
+               })
+               
+             </script>
+             
                         </div>
            
     

@@ -102,7 +102,80 @@ app.post("/add", function(req,res){
 });
 
 
+// Now we code for the edit JSON data 
 
+// *** get page to edit 
+app.get('/editcontact/:id', function(req,res){
+    // Now we build the actual information based on the changes made by the user 
+   function chooseContact(indOne){
+       return indOne.id === parseInt(req.params.id)
+       }
+
+
+  var indOne = contact.filter(chooseContact)
+    
+   res.render('editcontact', {res:indOne}); 
+    
+});
+
+// ** Perform the edit
+app.post('/editcontact/:id', function(req,res){
+    
+    // firstly we need to stringify our JSON data so it can be call as a variable an modified as needed
+    var json = JSON.stringify(contact)
+    
+    // declare the incoming id from the url as a variable 
+    var keyToFind = parseInt(req.params.id)
+    
+    // use predetermined JavaScript functionality to map the data and find the information I need 
+    var index = contact.map(function(contact) {return contact.id}).indexOf(keyToFind)
+    
+    // the next three lines get the content from the body where the user fills in the form
+    
+    var z = parseInt(req.params.id);
+    var x = req.body.name
+    var y = req.body.Comment
+
+   // The next section pushes the new data into the json file in place of the data to be updated  
+
+    contact.splice(index, 1, {name: x, Comment: y, email: req.body.email, id: z })
+    
+  
+    
+    // now we reformat the JSON and push it back to the actual file
+    json = JSON.stringify(contact, null, 4); // this line structures the JSON so it is easy on the eye
+    fs.writeFile('./model/contact.json',json, 'utf8', function(){})
+    
+    res.redirect("/contacts");
+    
+    
+})
+
+app.get('/deletecontact/:id', function(req,res){
+    
+    
+    // firstly we need to stringify our JSON data so it can be call as a variable an modified as needed
+    var json = JSON.stringify(contact)
+    
+    // declare the incoming id from the url as a variable 
+    var keyToFind = parseInt(req.params.id)
+    
+    // use predetermined JavaScript functionality to map the data and find the information I need 
+    var index = contact.map(function(contact) {return contact.id}).indexOf(keyToFind)
+    
+
+    contact.splice(index, 1)
+    
+  
+    
+    // now we reformat the JSON and push it back to the actual file
+    json = JSON.stringify(contact, null, 4); // this line structures the JSON so it is easy on the eye
+    fs.writeFile('./model/contact.json',json, 'utf8', function(){})
+    
+    res.redirect("/contacts");
+    
+    
+})
 
 
 
