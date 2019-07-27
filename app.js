@@ -8,12 +8,229 @@ app.use(express.static("views")); // Allow access to views folder
 app.use(express.static("style")); // Allow access to st
 app.use(express.static("images")); // Allow access to st
 
+var mysql = require('mysql');
+
 // body parser to get information
 
 var fs = require('fs')
 var bodyParser = require("body-parser") // call body parser module and make use of it
 app.use(bodyParser.urlencoded({extended:true}));
 
+
+
+// ******************************** Start of SQL **************************************** //
+
+// First we need to tell the application where to find the database
+
+const db = mysql.createConnection({
+host: 'den1.mysql1.gear.host',
+    user: 'nci',
+    password: 'Yo7A_B09i4?1',
+    database: 'NCI'
+ });
+// Next we need to create a connection to the database
+
+db.connect((err) =>{
+     if(err){
+        console.log("go back and check the connection details. Something is wrong.")
+        // throw(err)
+    } 
+     else{
+        
+        console.log('Looking good the database connected')
+    }
+    
+    
+})
+
+
+
+// this route will create a database table
+
+// app.get('/createtable', function(req,res){
+//     // Create a table that will show product Id, name, price, image and sporting activity
+//     let sql = 'CREATE TABLE liammc (Id int NOT NULL AUTO_INCREMENT PRIMARY KEY, Name varchar(255), Price int, Image varchar(255), Activity varchar(255))';
+    
+//     let query = db.query(sql, (err,res) => {
+        
+//         if(err) throw err;
+        
+//         console.log(res);
+        
+//     });
+    
+//     res.send("You created your first DB Table")
+    
+// })
+
+
+
+
+// This route will create a product 
+
+
+// app.get('/insert', function(req,res){
+//     // Create a table that will show product Id, name, price, image and sporting activity
+//     let sql = 'INSERT INTO liammc (Name, Price, Image, Activity) VALUES ("polar M400", 199, "polarm400.png", "Running") ';
+    
+//     let query = db.query(sql, (err,res) => {
+        
+//         if(err) throw err;
+        
+//         console.log(res);
+        
+//     });
+    
+//     res.send("You created your first Product")
+    
+// })
+
+
+
+// Url to get the products
+
+app.get('/products', function(req,res){
+    // Create a table that will show product Id, name, price, image and sporting activity
+    let sql = 'SELECT * FROM liammc';
+    
+    let query = db.query(sql, (err,result) => {
+        
+        if(err) throw err;
+        
+        console.log(result);
+        
+        res.render('products', {result})
+        
+    });
+    
+    //res.send("You created your first Product")
+    
+})
+
+// URL to get the add product page
+app.get('/addproduct', function(req,res){
+    // Create a table that will show product Id, name, price, image and sporting activity
+  
+        res.render('addproduct')
+        
+  
+    
+})
+
+
+// post request to write info to the database
+
+
+app.post('/addproduct', function(req,res){
+    // Create a table that will show product Id, name, price, image and sporting activity
+    let sql = 'INSERT INTO liammc (Name, Price, Image, Activity) VALUES ("   '+req.body.name+'   ", '+req.body.price+', "'+req.body.image+'", "'+req.body.activity+'") ';
+    
+    let query = db.query(sql, (err,res) => {
+        
+        if(err) throw err;
+        
+        console.log(res);
+        
+    });
+    
+    res.redirect('/products')
+    //res.send("You created your first Product")
+    
+})
+
+
+// URL to get the edit product page 
+
+app.get('/editproduct/:id', function(req,res){
+    
+        let sql = 'SELECT * FROM liammc WHERE Id =  "'+req.params.id+'" ';
+    
+    let query = db.query(sql, (err,result) => {
+        
+        if(err) throw err;
+        
+        console.log(result);
+        
+        res.render('editproduct', {result})
+        
+    });
+    
+    
+    
+    
+})
+
+
+// URL to edit product
+
+
+app.post('/editproduct/:id', function(req,res){
+    // Create a table that will show product Id, name, price, image and sporting activity
+    let sql = 'UPDATE liammc SET Name = "   '+req.body.name+'   ", Price = '+req.body.price+', Image = "'+req.body.image+'", Activity = "'+req.body.activity+'" WHERE Id =  "'+req.params.id+'" ';
+    
+    let query = db.query(sql, (err,res) => {
+        
+        if(err) throw err;
+        
+        console.log(res);
+        
+    });
+    
+    res.redirect('/products')
+    //res.send("You created your first Product")
+    
+})
+
+
+
+// URL TO delete a product
+
+app.get('/delete/:id', function(req,res){
+    
+        let sql = 'DELETE FROM liammc WHERE Id =  "'+req.params.id+'" ';
+    
+    let query = db.query(sql, (err,result) => {
+        
+        if(err) throw err;
+        
+        console.log(result);
+        
+       
+        
+    });
+    
+    res.redirect('/products')
+    
+    
+})
+
+
+
+
+
+
+// ******************************** End of SQL **************************************** //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ################################# From here is JSON Data ###########################################
 var contact = require("./model/contact.json");
 
 // set up simple hello world application using the request and response function
