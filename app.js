@@ -201,6 +201,25 @@ app.post('/editproduct/:id', function(req,res){
 })
 
 
+// Url to see individual product
+app.get('/product/:id', function(req,res){
+    // Create a table that will show product Id, name, price, image and sporting activity
+    let sql = 'SELECT * FROM liammc WHERE Id = "'+req.params.id+'" ';
+    
+    let query = db.query(sql, (err,result) => {
+        
+        if(err) throw err;
+        
+        console.log(res);
+        res.render('products', {result})
+    });
+    
+   // res.redirect('/products')
+    //res.send("You created your first Product")
+    
+})
+
+
 
 // URL TO delete a product
 
