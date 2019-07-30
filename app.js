@@ -213,9 +213,7 @@ app.get('/delete/:id', function(req,res){
         if(err) throw err;
         
         console.log(result);
-        
-       
-        
+  
     });
     
     res.redirect('/products')
@@ -268,7 +266,27 @@ app.post('/upload', function(req,res){
 // End Image upload
 
 
+// Search
 
+app.post('/search', function(req,res){
+    
+        let sql = 'SELECT * FROM liammc WHERE Name LIKE  "%'+req.body.search+'%" ';
+            let query = db.query(sql, (err,result) => {
+        
+        if(err) throw err;
+        console.log(req.body.search);
+        res.render('products', {result})
+        
+    });
+    
+    
+    
+    
+})
+
+
+
+// Search End
 
 
 
