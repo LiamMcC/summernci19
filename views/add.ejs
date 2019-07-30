@@ -2,7 +2,7 @@
 
 
 <div class="row">
-  <h1>Welcome to the add products page  <br>
+  <h1>Welcome to the add contact us page  <br>
 <div style="text-align: center; width: 100%; background-color: rgba(255, 255, 255, 0.8);text-align: center; margin-bottom: 10px;" >
          
          
@@ -10,11 +10,11 @@
          <form accept-charset="UTF-8" style="display: inline-block; width: 90%;" action="/add" method="post" >    
                 <div class="item">
                   <label for="name">Name</label>
-                    <input name="name" type="text" placeholder="Enter name" />
+                    <input name="name" type="text" placeholder="Enter name", required  pattern='[a-z,0-9]' title="please only enter lettrs"/>
                       <label for="price">Comment</label>
-                    <input name="Comment" type="text" placeholder="Enter comment" />
+                    <input name="Comment" type="text" placeholder="Enter comment", required title="Please do not leave this blenk and enter text oly here"/>
                    <label for="image">Email</label> 
-                    <input name="email" type="text" placeholder="Enter email" />
+                    <input name="email" type="text" placeholder="Enter email", required pattern="[a-z0-9]+\.[a-z]{3,}$" />
 <button class="button">Add</button>
           </div>
               </form>

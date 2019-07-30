@@ -17,6 +17,9 @@ var bodyParser = require("body-parser") // call body parser module and make use 
 app.use(bodyParser.urlencoded({extended:true}));
 
 
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
 
 // ******************************** Start of SQL **************************************** //
 
@@ -122,8 +125,24 @@ app.get('/addproduct', function(req,res){
 
 
 app.post('/addproduct', function(req,res){
+    
+ let sampleFile = req.files.sampleFile;
+   filename = sampleFile.name;
+    
+    sampleFile.mv('./images/' + filename, function(err){
+        
+        if(err)
+        
+        return res.status(500).send(err);
+        console.log("Image you are uploading is " + filename)
+       // res.redirect('/');
+    })
+    
+    
+    
+    
     // Create a table that will show product Id, name, price, image and sporting activity
-    let sql = 'INSERT INTO liammc (Name, Price, Image, Activity) VALUES ("   '+req.body.name+'   ", '+req.body.price+', "'+req.body.image+'", "'+req.body.activity+'") ';
+    let sql = 'INSERT INTO liammc (Name, Price, Image, Activity) VALUES ("   '+req.body.name+'   ", '+req.body.price+', "'+filename+'", "'+req.body.activity+'") ';
     
     let query = db.query(sql, (err,res) => {
         
@@ -214,6 +233,39 @@ app.get('/delete/:id', function(req,res){
 
 
 
+// image upload
+
+// This route will render the image upload page
+app.get('/upload', function(req,res){
+    
+    res.render('upload');
+    
+})
+
+
+
+// inserts the image to our images folder
+app.post('/upload', function(req,res){
+    
+    let sampleFile = req.files.sampleFile;
+   filename = sampleFile.name;
+    
+    sampleFile.mv('./images/' + filename, function(err){
+        
+        if(err)
+        
+        return res.status(500).send(err);
+        console.log("Image you are uploading is " + filename)
+        res.redirect('/');
+    })
+    
+    
+    
+    
+    
+})
+
+// End Image upload
 
 
 
