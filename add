@@ -1,0 +1,111 @@
+// Wi-Fi decentralised application for authentication to a private network using blockchain technology. Built by Liam McCabe
+var express = require("express"); // call express to be used by the application.
+// Call the express middleware
+var app = express();
+// allow the application to access a views folder where the application UI will sit
+const path = require('path');
+const VIEWS = path.join(__dirname, 'views');
+var fs = require('fs')
+// allow the application to access the images folder where the application UI images will sit
+app.use("/images",express.static(__dirname + "/images"));
+
+
+var contact = require("./devices/devices.json");
+
+
+// Code to call a route serving up the application index page 
+
+// function to render the home page
+app.get('/', function(req, res){
+   
+     res.sendFile('index.html', {root: VIEWS});
+     // Console log a message for testing reasons.
+     console.log("Now you are home!");
+   });
+
+   app.get('/liam', function(req, res){
+   
+    res.sendFile('liam.txt', {root: VIEWS});
+    // Console log a message for testing reasons.
+    console.log("Now you are home!");
+  });
+
+
+
+  //  app.get('/:mac', function(req, res){
+   
+  //   res.sendFile('added.html/', {root: VIEWS});
+  //   // Console log a message for testing reasons.
+  //   console.log(req.params.mac);
+  // });
+
+
+
+
+  app.get("/add", function(req,res){
+
+    // function getMax(contacts, id){ // function is called getMax
+    //   var max // the max variable is declared here but still unknown
+
+    //       for(var i=0; i<contacts.length; i++){ // loop through the contacts in the json fil as long as there are contcats to read
+    //           if(!max || parseInt(contact[i][id])> parseInt(max[id]))
+    //           max = contacts[i];
+    //               }
+
+    //   return max;
+    //    }
+
+       
+    //    // make a new ID for the next item in the JSON file
+       
+    //     maxCid = getMax(contact, "id") // calls the gstMax function from above and passes in parameters 
+       
+    //    var newId = maxCid.id + 1; // add 1 to old largest to make ne largest
+       
+    //    // show the result in the console
+    //    console.log("new Id is " + newId)
+             
+             var contactsx = {
+                 
+                 
+              MAC: 'newId',
+                 name: 'req.body.name',
+                 device1Auth: true,
+                 device2Auth: 'req.body.email'
+                 
+             }
+             
+             
+    fs.readFile('./devices/devices.json', 'utf8',  function readfileCallback(err){
+        
+        if(err) {
+            throw(err)
+            
+        } else {
+            
+            contact.push(contactsx); // add the new data to the JSON file
+            json = JSON.stringify(contact, null, 4); // this line structures the JSON so it is easy on the eye
+            fs.writeFile('./devices/devices.json',json, 'utf8', function(){})
+            console.log(contactsx)
+        }
+        
+    })         
+             
+     res.send('Check Json') ;
+    
+});
+
+// Start the server on port 3000
+app.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0" , function(){
+    console.log("App is Running ......... Yessssssssssssss!")
+  });
+
+
+
+
+  // app.get('/hello', function(req, res){
+   
+  //   res.send('Well Done now check the contract');
+  //   // Console log a message for testing reasons.
+  //   console.log("Now you are home!");
+  // });
