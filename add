@@ -1,111 +1,134 @@
-// Wi-Fi decentralised application for authentication to a private network using blockchain technology. Built by Liam McCabe
-var express = require("express"); // call express to be used by the application.
-// Call the express middleware
-var app = express();
-// allow the application to access a views folder where the application UI will sit
-const path = require('path');
-const VIEWS = path.join(__dirname, 'views');
-var fs = require('fs')
-// allow the application to access the images folder where the application UI images will sit
-app.use("/images",express.static(__dirname + "/images"));
 
-
-var contact = require("./devices/devices.json");
-
-
-// Code to call a route serving up the application index page 
-
-// function to render the home page
-app.get('/', function(req, res){
-   
-     res.sendFile('index.html', {root: VIEWS});
-     // Console log a message for testing reasons.
-     console.log("Now you are home!");
-   });
-
-   app.get('/liam', function(req, res){
-   
-    res.sendFile('liam.txt', {root: VIEWS});
-    // Console log a message for testing reasons.
-    console.log("Now you are home!");
-  });
+var dhcpd = require('dhcp');
+var fs = require("fs");
 
 
 
-  //  app.get('/:mac', function(req, res){
-   
-  //   res.sendFile('added.html/', {root: VIEWS});
-  //   // Console log a message for testing reasons.
-  //   console.log(req.params.mac);
-  // });
+var s = dhcpd.createServer({
+  // System settings
+
+  
+
+  
+  range: [
+    "192.168.1.10", "192.168.1.20"
+  ],
+  forceOptions: ['hostname'], // Options that need to be sent, even if they were not requested
+  randomIP: true, // Get random new IP from pool instead of keeping one ip
+  static: {
+     
+    // this line forsefully binds a mac address to an IP
+   // "A8-5B-78-9C-8D-CA": "192.168.1.88",
+   // "78-0C-B8-33-28-F9": "192.168.1.87"
+  },
+
+  // Option settings
+  netmask: '255.255.255.0',
+  router: [
+    '192.168.0.1'
+  ],
+  timeServer: null,
+  nameServer: null,
+  //dns: ["8.8.8.8", "8.8.4.4"],
+  hostname: "kacknup",
+  domainName: "xarg.org",
+  broadcast: '192.168.0.255',
+  server: '192.168.0.1', // This is us
+  maxMessageSize: 1500,
+  leaseTime: 86400,
+  renewalTime: 60,
+  rebindingTime: 120,
+
+});
+// The iPhone is A8-5B-78-9C-8D-CA
+s.on('message', function(data) {
+// Access the device list
+// var devices = require("http://192.168.1.4:3000/liam.txt");
+// var devices = require("http://192.168.1.4:3000/devices.json");
+var devices = require("./devices/devices.json");
+var newdevices = require("./devices/newdevice.json");
+
+      //This function filters the device list based on the MAC of joining device 
+            function chooseContact(indOne){
+            return indOne.MAC === data.chaddr;
+          
+          }
+      
+      
+                var indOne = devices.filter(chooseContact)
+                var oneDevice = JSON.stringify(indOne)
+     
+                console.log("One Filtered Device " + oneDevice)
+
+                console.log("\n\nThe MAC Address of the device that just attempted to join: " + data.chaddr + "\n\n");
+                // This line looks in the json file to see if the Mac Address is there and that the True is recorded against device1Auth & device2Auth
+                console.log('I Looked in JSON and saw ---- '+ indOne.some(item => item.MAC === data.chaddr && item.device1Auth === true & item.device2Auth === true));
+ 
+   //var inDevice= arr.some(item => item.id === data.chaddr)
 
 
+  //if(inDevice == true){console.log("\n\nDevice authorised")}else{console.log("\n\nmismatch: Get off my network")}
 
+// Attempt to automate Mac Address 
+// The idea is to add the new device MAC to a JSON file
+// Then read from that JSON file on the authenticate device page and fill the text box with the value
 
-  app.get("/add", function(req,res){
-
-    // function getMax(contacts, id){ // function is called getMax
-    //   var max // the max variable is declared here but still unknown
-
-    //       for(var i=0; i<contacts.length; i++){ // loop through the contacts in the json fil as long as there are contcats to read
-    //           if(!max || parseInt(contact[i][id])> parseInt(max[id]))
-    //           max = contacts[i];
-    //               }
-
-    //   return max;
-    //    }
-
-       
-    //    // make a new ID for the next item in the JSON file
-       
-    //     maxCid = getMax(contact, "id") // calls the gstMax function from above and passes in parameters 
-       
-    //    var newId = maxCid.id + 1; // add 1 to old largest to make ne largest
-       
-    //    // show the result in the console
-    //    console.log("new Id is " + newId)
-             
-             var contactsx = {
+var contactsx = {
                  
                  
-              MAC: 'newId',
-                 name: 'req.body.name',
-                 device1Auth: true,
-                 device2Auth: 'req.body.email'
-                 
-             }
-             
-             
-    fs.readFile('./devices/devices.json', 'utf8',  function readfileCallback(err){
-        
-        if(err) {
-            throw(err)
-            
-        } else {
-            
-            contact.push(contactsx); // add the new data to the JSON file
-            json = JSON.stringify(contact, null, 4); // this line structures the JSON so it is easy on the eye
-            fs.writeFile('./devices/devices.json',json, 'utf8', function(){})
-            console.log(contactsx)
-        }
-        
-    })         
-             
-     res.send('Check Json') ;
-    
+  MAC: data.chaddr
+     
+ }
+ 
+ 
+fs.readFile('./devices/newdevice.json', 'utf8',  function readfileCallback(err){
+
+if(err) {
+throw(err)
+
+} else {
+  newdevices.splice(0, 1, {MAC: data.chaddr})
+  //newdevices.push(contactsx); // add the new data to the JSON file
+json = JSON.stringify(newdevices, null, 4); // this line structures the JSON so it is easy on the eye
+
+fs.writeFile('./devices/newdevice.json',json, 'utf8', function(){})
+
+console.log(contactsx)
+}
+
+})         
+
+// attempt tp automate mac address end
+
+
 });
 
-// Start the server on port 3000
-app.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0" , function(){
-    console.log("App is Running ......... Yessssssssssssss!")
-  });
+s.on('bound', function(state) {
+// A8-5B-78-9C-8D-CA
+   // if(inDevice == true){console.log("\n\nLook you are in")}else{console.log("\n\nmismatch: Get off my network")}
+   if(1==1){console.log("A8-5B-78-9C-8D-CA")}
+ console.log("BOUND Nice Line:");
+ console.log(state);
+ 
+  
+});
+
+s.on("error", function(err, data) {
+  console.log(err, data);
+});
+
+s.on("listening", function(sock) {
+  var address = sock.address();
+  console.info('Server Listening: ' + address.address + ':' + address.port);
+});
+
+s.on("close", function() {
+  console.log('close');
+});
 
 
+s.listen();
 
-
-  // app.get('/hello', function(req, res){
-   
-  //   res.send('Well Done now check the contract');
-  //   // Console log a message for testing reasons.
-  //   console.log("Now you are home!");
-  // });
+process.on('SIGINT', () => {
+  s.close();
+});
